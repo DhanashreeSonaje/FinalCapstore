@@ -1,0 +1,45 @@
+<p>add-promocode works!</p>
+<h1 style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;text-align: center;"> ADD PROMOCODE</h1>
+
+<h2>Coupon Creation</h2>
+<div class="container">
+  
+<div [hidden]="submitted" style="width: 300px;">
+  
+  <form #actCreateForm="ngForm" (ngSubmit)="onSubmit()">
+
+    <label for="couponCode">Coupon Code:</label>
+    <input id="couponCode" name="couponCode" class="form-control" [(ngModel)]="coupons.couponCode" #couponCode="ngModel" >
+
+    <label for="couponStartDate">CouponStartDate:</label>
+    <input id="couponStartDate" type="date" name="couponStartDate" class="form-control" required  [(ngModel)]="coupons.couponStartDate" 
+    #couponStartDate="ngModel">
+  
+    <label for="couponEndDate">CouponEndDate:</label>
+    <input type="date" class="form-control" id="couponEndDate" required [(ngModel)]="coupons.couponEndDate" 
+    name="couponEndDate" #couponEndDate="ngModel">
+
+    <label for="couponAmount">Coupon Amount:</label>
+    <input type="number" class="form-control" name="couponAmount" [(ngModel)]="coupons.couponAmount" 
+    #couponAmount="ngModel" required >
+  
+    <label for="couponMinOrderAmount">Minimum Amount:</label>
+    <input type="number" class="form-control" id="couponMinOrderAmount" required [(ngModel)]="coupons.couponMinOrderAmount" 
+    name="couponMinOrderAmount" #couponMinOrderAmount="ngModel">
+    
+
+   <button (click)="back()"  class="btn btn-secondary" style="margin-left: 10px"><<Back</button>
+    <button type="submit" [disabled]="!actCreateForm.form.valid" class="btn btn-success">ADD COUPON</button>
+  </form>
+
+  
+</div>
+
+    <div [hidden]="!submitted">
+      <h4>Submitted successfully!</h4>
+ <button (click)="back()"  class="btn btn-secondary" style="margin-left: 10px"><<Back</button>
+    </div>
+</div>
+
+
+

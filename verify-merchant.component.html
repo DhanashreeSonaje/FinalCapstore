@@ -1,0 +1,35 @@
+<div class="container">
+  <div class="panel-heading">
+      <h1>Merchants</h1>
+  </div>
+  <div class="panel-body">
+      <table class="table table-striped table-hover" style="color:indigo" >
+          <thead>
+              <tr>
+                  <th>Merchant Id</th>
+                  <th>Merchant Name</th>
+                  <th>Merchant UserName</th>
+                  <th>Merchant Phone No</th>
+                  <th>Merchant Email Id</th>
+                  <th>Status</th>
+                  <th>Accept</th>   
+                  <th>Reject</th>              
+              </tr>
+          </thead>
+          <tbody>
+              <tr *ngIf = "merchant">
+                  <td>{{merchant.userId}}</td>
+                  <td>{{merchant.name}}</td>
+                  <td>{{merchant.username}}</td>
+                  <td>{{merchant.phoneNumber}}</td>
+                  <td>{{merchant.email}}</td>
+                  <td>{{merchant.active}}</td>
+                  <td><button (click)="acceptMerchant(merchant.email)" class="is-small btn btn-primary">Accept</button></td>
+                  <td><button (click)="rejectMerchant(merchant.email)" class="is-small btn btn-danger">Reject</button></td>
+              </tr>
+          </tbody>
+      </table>
+  </div>
+  
+</div>
+

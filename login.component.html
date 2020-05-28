@@ -1,0 +1,149 @@
+<body>
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <span class="navbar-brand" style="color: whitesmoke;"
+          ><strong>CapStore</strong></span
+        >
+      </div>
+      <ul class="nav navbar-nav">
+        <li style="color: whitesmoke;" class="active">
+          <a href="#"><span class="glyphicon glyphicon-home"></span> LogIn</a>
+        </li>
+        <li style="color: whitesmoke;">
+          <a href="#"
+            ><span
+              style="color: whitesmoke;"
+              class="glyphicon glyphicon-globe"
+            ></span>
+            About Us</a
+          >
+        </li>
+        <li style="color: black;">
+          <a href="#"
+            ><span
+              style="color: whitesmoke;"
+              class="glyphicon glyphicon-envelope"
+            ></span>
+            Mail Us</a
+          >
+        </li>
+        <li style="color: whitesmoke;">
+          <a href="#"
+            ><span
+              style="color: whitesmoke;"
+              class="glyphicon glyphicon-earphone"
+            ></span>
+            Call Us</a
+          >
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <!-- <form *ngIf="!flag" (ngSubmit)="whichRole(enForm)" #enForm="ngForm">
+   
+    <div class="radio">
+      <label><input type="radio" name="optradio" [(ngModel)]=role id="optradio" value="Customer" checked>Customer</label>
+    </div>
+    <div class="radio">
+      <label><input type="radio" name="optradio" [(ngModel)]=role value="Merchant">Merchant</label>
+    </div>
+    <input type="submit" value="Confirm">
+</form> -->
+  <div class="loginbox">
+    <img src="/assets/Images/avatar.svg" class="avatar" alt="User" />
+    <form #enForm="ngForm" novalidate>
+      <div class="form-group">
+        <label>Enter Email:</label>
+        <input
+          type="email"
+          id="Email"
+          name="Email"
+          class="form-control"
+          required
+          [(ngModel)]="email"
+          #Email="ngModel"
+        />
+        <div *ngIf="Email.invalid && (Email.dirty || Email.touched)">
+          <small class="text-danger">
+            <small *ngIf="Email.errors.required">
+              Email is required.
+            </small>
+          </small>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password:</label>
+        <input
+          type="password"
+          id="pass"
+          name="pass"
+          class="form-control"
+          required
+          [(ngModel)]="password"
+          #pass="ngModel"
+        />
+        <div *ngIf="pass.invalid && (pass.dirty || pass.touched)">
+          <small class="text-danger">
+            <small *ngIf="pass.errors.required">
+              Password is required.
+            </small>
+          </small>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="role">Role</label>
+        <br />
+        <label class="radio-inline" style="display: inline;">
+          <input
+            type="radio"
+            name="Role"
+            [(ngModel)]="role"
+            value="Customer"
+            #Role="ngModel"
+            required
+          />Customer
+        </label>
+        <label class="radio-inline">
+          <input
+            type="radio"
+            name="Role"
+            [(ngModel)]="role"
+            value="Merchant"
+            #Role="ngModel"
+            required
+          />Merchant
+        </label>
+        <label class="radio-inline">
+          <input
+            type="radio"
+            name="Role"
+            [(ngModel)]="role"
+            value="Third-Party Merchant"
+            #Role="ngModel"
+            required
+          />Third-Party Merchant
+        </label>
+        <div *ngIf="Role.invalid && (Role.dirty || Role.touched)">
+          <small class="text-danger">
+            <small *ngIf="Role.errors.required">
+              Field is mandatory.
+            </small>
+          </small>
+        </div>
+      </div>
+      <div small class="text-danger">{{ errorMessage }}</div>
+      <input
+        type="submit"
+        name="submit"
+        value="Login"
+        (click)="onSubmit(enForm)"
+        [disabled]="enForm.form.invalid"
+      />
+      <br />
+      <a href="#">Forgot password?</a>
+      <br />
+      <a [routerLink]="['/signup']">SignUp?</a>
+    </form>
+  </div>
+</body>

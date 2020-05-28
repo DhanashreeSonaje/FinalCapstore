@@ -1,0 +1,161 @@
+<head>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+<body>
+
+  <!--navigation bar-->
+<div>
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <ul class="nav navbar-nav">
+
+
+        <li>
+          <div id="mySidebar" class="sidebar">
+            <a class="closebtn" (click)="closeNav()">×</a>
+            <ul>
+              <li><h1 style="color: white;">Menu</h1></li>
+            <li><a href="#">Profile</a></li>
+            <li><a href="#">Wish List</a></li>
+            <li> <a href="#">Feedback</a></li>
+            <li>  <a href="#">Orders</a></li></ul>
+          </div>
+        
+          
+          <a style="padding-top: 20px;" (click)="openNav()"><b>☰ </b></a>  
+          
+    
+        </li>
+        <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#" style="padding-top: 20px;"><b>Categories</b> <span class="caret"></span></a>
+          <ul class="dropdown-menu" (click)="getCategoryProducts($event)">
+            <li><a>All Products</a></li>
+           <li><a *ngFor="let product of products">{{product.productCategory}}</a></li>
+          </ul>
+        </li>
+      
+
+      
+        <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#" style="padding-top: 20px;"><b>Discounts</b> <span class="caret"></span></a>
+          <ul class="dropdown-menu" (click)="getDiscountProducts($event)">
+            <li><a>Less than 50</a></li>
+            <li><a>50-60</a></li>
+            <li><a>60-70</a></li>
+            <li><a>Greater than 70</a></li>
+          </ul>
+        </li>
+      
+      <li style="padding-top: 6px;"> <a id="title" (click)="openPop()" ><b>Coupons </b></a></li>
+      <li> <b style="color: white;"><h1 style="padding-left: 500px;">Capstore</h1> </b></li>
+
+       
+
+        
+         
+
+         </ul>
+         <div style="float: right;padding-top: 6px;">
+         <div class="search-container">
+          <form class="form-inline">
+            <input  class="form-control mr-sm-2" style="width: 500px;margin-right: 3px;margin-top: 6px;" type="text"    required  [(ngModel)]="searchProduct" name="username" ngModel>
+           <input class="btn btn-primary" type="submit" value="Search" style="margin-top: 6px;" (click)="search()"><i class="glyphicon glyphicon-triangle-bottom"></i>
+          
+            
+           
+          </form>
+        </div>
+      </div>
+    
+
+    </div>
+  </nav></div>
+
+
+  <!--slider -->
+<div>
+<div id="slideshow">
+  <div class="slide-wrapper">
+    <div class="slide"><a (click)="show()"><img style="width: 728px; height: 405px;" src="https://c8.alamy.com/comp/2AKGW7J/grocery-shopping-promotional-sale-advertisement-fast-shopping-cart-full-of-fresh-colorful-food-2AKGW7J.jpg"/></a></div>
+    <div class="slide"><a (click)="show()"><img style="width: 728px; height: 310px;" src="https://dtkshop.com/image/cache/catalog/home/slider-01-1903x700-1903x700.jpg"/></a></div>
+    <div class="slide"><a (click)="show()"><img style="width: 728px; height: 310px;" src="https://bmfshopcart.com/image/catalog/demo/slider/mobile_slide/slide1.jpg"/></a></div>
+    <div class="slide"><a (click)="show()"><img style="width: 728px; height: 405px;" src="https://images.moneycontrol.com/static-mcnews/2020/04/1-grocery-shopping.jpg"/></a></div>
+    </div>
+</div>
+</div>
+
+
+
+
+<br><br>
+
+
+<!--to display promo codes-->
+  <div class="w3-container">
+    <div id="id01" class="w3-modal">
+      <div class="w3-modal-content">
+        <div class="w3-container">
+          <span (click)="closePop()" class="w3-button w3-display-topright">&times;</span>
+          <div class="scroll">
+         <table class=" table table-striped">
+       <thead>
+         <tr>
+          
+          <th>Coupon Amount</th>
+           <th>Coupon Start Date</th>
+           <th>Coupon End Date</th>
+           <th>Minimum Order Amount</th>
+         </tr>
+       </thead>
+       <tbody>
+         <tr *ngFor="let coupon of couponList">
+         <td>{{coupon.couponAmount}}</td>
+         <td>{{coupon.couponStartDate}}</td>
+         <td>{{coupon.couponEndDate}}</td>
+         <td>{{coupon.couponMinOrderAmount}}</td></tr>
+       </tbody>
+         </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+<!--to display products-->
+  <div class="container">
+
+    <div class="row">
+    <div class="col-md-4" *ngFor="let product of categoryProducts">
+      <figure class="card card-product">
+        <div class="img-wrap"><img src="" alt="Product Image"></div>
+        <figcaption class="info-wrap">
+            <h4 class="title"><b>{{product.productName}}</b></h4>
+            <!--<p class="desc">{{product.productInfo}}</p>-->
+           <p class="desc" #x>{{product.productId}}</p>
+            <div class="price-wrap h5">
+              <span class="price-new">{{product.productPrice}}</span> 
+            </div> <!-- price-wrap.// -->
+        </figcaption>
+        <div class="bottom-wrap">
+          <a (click)="productPage(product.productId)" class="btn btn-sm btn-primary float-right">Product Page</a>	
+          
+        </div> <!-- bottom-wrap.// -->
+      </figure>
+    </div> <!-- col // -->
+    
+    
+    </div> <!-- row.// -->
+    
+    
+    
+    </div> 
+ 
+  
+  
+</body>
