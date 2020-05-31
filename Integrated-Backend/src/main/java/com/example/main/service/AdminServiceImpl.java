@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.example.main.dao.AdminDao;
 import com.example.main.email_token.ConfirmationToken;
 import com.example.main.email_token.EmailSenderService;
+import com.example.main.exception.UserAlreadyExistsException;
 import com.example.main.model.CommonFeedback;
 import com.example.main.model.Coupon;
 import com.example.main.model.CustomerDetails;
@@ -51,8 +52,8 @@ public class AdminServiceImpl implements AdminService{
 
 	//Merchant: 
 	@Override
-	public MerchantDetails addMerchant(MerchantDetails m) {
-		return adminDao.addMerchant(m);
+	public void addMerchant(MerchantDetails m) throws MessagingException, UserAlreadyExistsException {
+		adminDao.addMerchant(m);
 		
 	}
 
@@ -85,13 +86,6 @@ public class AdminServiceImpl implements AdminService{
 		return adminDao.findMerchantByeMail(email);
 	}
 
-
-	public MerchantDetails getApproval(String email, boolean approved) {
-		MerchantDetails merchant = adminDao.findMerchantByeMail(email);
-		merchant.setApproved(approved);
-		adminDao.addMerchant(merchant);
-		return merchant;
-	}
 	
 	
 	public List<MerchantDetails> getMerchants() {
@@ -99,8 +93,20 @@ public class AdminServiceImpl implements AdminService{
 		adminDao.findAllMerchants().forEach(merchant::add);
 		return merchant;
 	}
-
 	
+	public boolean confirmAccount(String confirmationToken) {
+		boolean val=adminDao.confirmAccount(confirmationToken);
+		return val;
+	}
+	
+	public MerchantDetails generateToken(String confirmationToken, String action) throws MessagingException{
+		MerchantDetails merchant=adminDao.generateToken(confirmationToken, action);
+		return merchant;
+	}
+
+	public MerchantDetails userLogin(String confToken) {
+		return adminDao.userLogin(confToken);
+	}
 	
 	//Product:
 	@Override
@@ -179,10 +185,10 @@ public class AdminServiceImpl implements AdminService{
 		return adminDao.getAllCommonFeedbackByProductId(productId);
 	}
 
-//	@Override
-//	public int forwardRequestToMerchant(int feedbackId) {
-//		return adminDao.forwardRequestToMerchant(feedbackId);
-//	}
+	@Override
+	public int forwardRequestToMerchant(int feedbackId) {
+		return adminDao.forwardRequestToMerchant(feedbackId);
+	}
 
 	@Override
 	public String forwardResponseToCustomer(int feedbackId) {
@@ -243,109 +249,114 @@ public class AdminServiceImpl implements AdminService{
 	
 
 	@Override
-	public List<Coupon> getCoupons() {
-		List<Coupon> coupon = new ArrayList<>();
-		couponRepo.findAll().forEach(coupon::add);
+	public List<Coupon> getAllCoupons() {
+		//List<Coupon> coupon = new ArrayList<>();
+		//couponRepo.findAll().forEach(coupon::add);
+		List<Coupon> coupon = adminDao.getAllCoupons();
 		return coupon;
 	}
 
 	@Override
 	public Coupon getCouponById(int couponId) throws Exception {
-		Coupon coupon = couponRepo.findById(couponId)
-				.orElseThrow(() -> new Exception("Coupon not found for this id : " + couponId));
+		Coupon coupon = adminDao.getCouponById(couponId);
 		return coupon;
 	}
 
 	@Override
 	public Coupon getCouponByCode(String couponCode) {
-		Coupon coupon = couponRepo.findByCouponCode(couponCode);
+		Coupon coupon = adminDao.getCouponByCode(couponCode);
 		return coupon;
 	}
 
 	@Override
 	public void addCoupon(@Valid Coupon coupon) throws MessagingException {
-		couponRepo.save(coupon);
-        
-			long cnt=merchantRepository.count();
-			List <MerchantDetails> merchants=merchantRepository.findAll();
-        MimeMessage mailMessage = emailSenderService.createMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
-        String url = "http://localhost:4200/applyCoupon/"+coupon.getCouponId();
-        
-       
-        	for(MerchantDetails mer:merchants) {
-        		helper.setTo(mer.getEmail());
-        		System.out.println(mer.getEmail());
-        		helper.setSubject("Coupon Creation Approval!");
-                helper.setText("<html><body><h1>Coupon Registration!</h1><br>" +
-          			  coupon+"<br><button type='submit' class='is-small btn btn-info'>"
-    		  		+ "<a href="+url+"/"+mer.getUserId()+">Show Details</a></button>",true);
-                
-                emailSenderService.sendEmail(mailMessage);
-        	}
+//		couponRepo.save(coupon);
+//        
+//			long cnt=merchantRepository.count();
+//			List <MerchantDetails> merchants=merchantRepository.findAll();
+//        MimeMessage mailMessage = emailSenderService.createMessage();
+//        MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
+//        String url = "http://localhost:4200/applyCoupon/"+coupon.getCouponId();
+//        
+//       
+//        	for(MerchantDetails mer:merchants) {
+//        		helper.setTo(mer.getEmail());
+//        		System.out.println(mer.getEmail());
+//        		helper.setSubject("Coupon Creation Approval!");
+//                
+//                helper.setText("<html><body style='border-style: solid;\r\n" + 
+//	            		"  border-color: #DCDCDC; background-color: #F0FFFF; height: 250px; width:500px; margin-left:250px'>"
+//	            		+ "<h1>Coupon Registration!</h1><br>" +
+//	            		coupon+"<br><button type='submit' autofocus style='margin-left:220px; border-radius: 9px; border: 2px solid #DCDCDC'>"
+//	            		+"<a href="+url+"/"+mer.getUserId()+">Show Details</a></button>",true);
+//
+//                
+//                emailSenderService.sendEmail(mailMessage);
+//        	}
+		adminDao.addCoupon(coupon);
 	}
 
 	@Override
 	public Coupon generateCoupon(int couponId, int id) throws Exception {
-		Coupon coupon = couponRepo.findById(couponId)
-    			.orElseThrow(() -> new Exception("Coupon not found for this id : " + couponId));
-    	
-        ConfirmationToken confirmationToken = new ConfirmationToken(coupon.getUserId());
-       confirmationTokenRepository.save(confirmationToken);
-        
-        MerchantDetails merchant = merchantRepository.findById(id)
-        		.orElseThrow(()->new Exception("Merchant not found for this id : " + coupon.getUserId()));
-        
-        coupon.setApproved(true);
-        coupon.setUseId(id);
-        couponRepo.save(coupon);
-        merchantRepository.save(merchant);
-        
-        MimeMessage mailMessage = emailSenderService.createMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
-        String url = "http://localhost:4200/sendCoupon/"+coupon.getCouponId();
-        helper.setTo("dsonaje6@gmail.com");
-        helper.setSubject("Coupon Accepted!");
-        helper.setFrom("capstore06@gmail.com");
-        helper.setText("Merchant accepted coupon offer: "+coupon+"\nTo send this offer, please click here : "
-        +"\n"+url);
-
-        emailSenderService.sendEmail(mailMessage);
+//		Coupon coupon = couponRepo.findById(couponId)
+//    			.orElseThrow(() -> new Exception("Coupon not found for this id : " + couponId));
+//    	
+//        ConfirmationToken confirmationToken = new ConfirmationToken(coupon.getUserId());
+//       confirmationTokenRepository.save(confirmationToken);
+//        
+//        MerchantDetails merchant = merchantRepository.findById(id)
+//        		.orElseThrow(()->new Exception("Merchant not found for this id : " + coupon.getUserId()));
+//        
+//        coupon.setApproved(true);
+//        coupon.setUseId(id);
+//        couponRepo.save(coupon);
+//        merchantRepository.save(merchant);
+//        
+//        MimeMessage mailMessage = emailSenderService.createMessage();
+//        MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
+//        String url = "http://localhost:4200/sendCoupon/"+coupon.getCouponId();
+//        helper.setTo("dsonaje6@gmail.com");
+//        helper.setSubject("Coupon Accepted!");
+//        helper.setFrom("capstore06@gmail.com");
+//        helper.setText("Merchant accepted coupon offer: "+coupon+"\nTo send this offer, Please click here : "
+//        +"\n"+url);
+//
+//        emailSenderService.sendEmail(mailMessage);
+		Coupon coupon = adminDao.generateCoupon(couponId, id);
 		return coupon;
 	}
 
 	@Override
 	public Coupon sendCoupon(int couponId) throws Exception {
-		Coupon coupon = couponRepo.findById(couponId)
-    			.orElseThrow(() -> new Exception("Coupon not found for this id : " + couponId));
-        
-        MimeMessage mailMessage = emailSenderService.createMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
-        String url = "http://localhost:4200/productpage/";
-        
-        List <MerchantDetails> merchants = merchantRepository.findAll();
-        
-        for(MerchantDetails mer:merchants) {
-    		helper.setTo(mer.getEmail());
-    		helper.setSubject("Latest Offers!!!");
-            helper.setFrom("capstore06@gmail.com");
-            helper.setText("Current Offers: "+coupon+"\nGrab this offer, please click here : "
-            +"\n"+url);
-
-            emailSenderService.sendEmail(mailMessage);
-    	}
+//		Coupon coupon = couponRepo.findById(couponId)
+//    			.orElseThrow(() -> new Exception("Coupon not found for this id : " + couponId));
+//        
+//        MimeMessage mailMessage = emailSenderService.createMessage();
+//        MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
+//        String url = "http://localhost:4200/productpage/";
+//        
+//        List <MerchantDetails> merchants = merchantRepository.findAll();
+//        
+//        for(MerchantDetails mer:merchants) {
+//    		helper.setTo(mer.getEmail());
+//    		helper.setSubject("Latest Offers!!!");
+//            helper.setFrom("capstore06@gmail.com");
+//            helper.setText("Current Offers: "+coupon+"\nGrab this offer, Please click here : "
+//            +"\n"+url);
+//
+//            emailSenderService.sendEmail(mailMessage);
+//    	}
+		Coupon coupon = adminDao.sendCoupon(couponId);
         return coupon;
 	}
 
 	@Override
 	public Boolean deleteCoupon(int couponId) {
-		boolean exists = couponRepo.existsById(couponId);
-		couponRepo.deleteById(couponId);
+//		boolean exists = couponRepo.existsById(couponId);
+//		couponRepo.deleteById(couponId);
+		boolean exists = adminDao.deleteCoupon(couponId);
 		return true;
 	}
 
-	
-
-	
-
 }
+

@@ -1,7 +1,5 @@
 package com.example.main.controller;
 
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,11 +7,11 @@ import java.util.Map;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.validation.Valid;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,7 +47,8 @@ import com.example.main.service.EmailService;
 @RequestMapping(value="/capstore/admin",method= {RequestMethod.POST, RequestMethod.GET, RequestMethod.PUT})
 public class AdminController {
 
-			
+		org.slf4j.Logger logger = LoggerFactory.getLogger(AdminController.class);	
+	
 		@Autowired
 		private AdminService adminService;
 		
@@ -81,9 +80,8 @@ public class AdminController {
 		@GetMapping("/getAllCustomers")
 		public ResponseEntity<List<CustomerDetails>> getAllCustomers()
 		   {
+				logger.trace("Get all customers working...");
 				List<CustomerDetails> customers= adminService.getAllCustomers();
-				System.out.println("In Get All Customers");
-				System.out.println(customers);
 				if(customers.isEmpty()) {
 					return new ResponseEntity("Sorry! No Customer Found!", HttpStatus.NOT_FOUND);
 				}
@@ -91,104 +89,117 @@ public class AdminController {
 				return new ResponseEntity<List<CustomerDetails>>(customers, HttpStatus.OK);
 			}
 		  
-		@DeleteMapping("/deleteCustomer/{userId}")//Not working --->delete cascaded ones first
+		@DeleteMapping("/deleteCustomer/{userId}")
 		public  String deleteCustomer(@PathVariable("userId")int userId) {
+			 logger.trace("Delete Customer working...");
 			 adminService.removeCustomerById(userId);
 			 return "Account removed successfully!";
 			}
 		 
 		 
-		 
-		 
-		 
 		 //merchant:
 		 
 		@RequestMapping(value="/registerMerchant", method = RequestMethod.POST)
-	    public ResponseEntity<?> registerMerchant(@Valid @RequestBody MerchantDetails md) throws MessagingException
+	    public ResponseEntity<?> registerMerchant(@Valid @RequestBody MerchantDetails md) throws MessagingException, UserAlreadyExistsException
 	    {
-
-	        MerchantDetails existingMerchant = userRepository.findMerchantByEmailIgnoreCase(md.getEmail());
-	        if(existingMerchant != null)
-	        {
-	            return new ResponseEntity<Error>(HttpStatus.CONFLICT);
-	        }
-	        else
-	        {
-	            userRepository.saveMerchant(md);
-	            MerchantDetails md1=userRepository.findMerchantByEmailIgnoreCase(md.getEmail());
-
-	            ConfirmationToken confirmationToken = new ConfirmationToken(md1.getUserId());
-
-	            confirmationTokenRepository.save(confirmationToken);
-	            
-	            MimeMessage mailMessage = emailSenderService.createMessage();
-	            MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
-	            String url = "http://localhost:4200/verifyMerchant?token="+confirmationToken.getConfirmationToken();
-	            helper.setTo("dsonaje6@gmail.com");
-	            helper.setSubject("Merchant Requesting Approval!");
-	            helper.setFrom("capstore06@gmail.com");
-	            helper.setText("<html><body><h1>Merchant Registration!</h1><br>" +
-	            		md+"<br><button type='submit' class='is-small btn btn-info'>"
-	            		+"<a href="+url+">Show Details</a></button>",true);
-
-	            emailSenderService.sendEmail(mailMessage);
-	            
+			logger.trace("Create Merchant working...");
+//	        MerchantDetails existingMerchant = userRepository.findMerchantByEmailIgnoreCase(md.getEmail());
+//	        if(existingMerchant != null)
+//	        {
+//	            return new ResponseEntity<Error>(HttpStatus.CONFLICT);
+//	        }
+//	        else
+//	        {
+//	            userRepository.saveMerchant(md);
+//	            MerchantDetails md1=userRepository.findMerchantByEmailIgnoreCase(md.getEmail());
+//
+//	            ConfirmationToken confirmationToken = new ConfirmationToken(md1.getUserId());
+//
+//	            confirmationTokenRepository.save(confirmationToken);
+//	            
+//	            MimeMessage mailMessage = emailSenderService.createMessage();
+//	            MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
+//	            String url = "http://localhost:4200/verifyMerchant?token="+confirmationToken.getConfirmationToken();
+//	            helper.setTo("dsonaje6@gmail.com");
+//	            helper.setSubject("Merchant Requesting Approval!");
+//	            helper.setFrom("capstore06@gmail.com");
+//	            helper.setText("<html><body style='border-style: solid;\r\n" + 
+//	            		"  border-color: #DCDCDC; background-color: #F0FFFF; height: 250px; width:500px; margin-left:250px'>"
+//	            		+ "<h1>Merchant Registration!</h1><br>" +
+//	            		md+"<br><button type='submit' autofocus style='margin-left:220px; border-radius: 9px; border: 2px solid #DCDCDC'>"
+//	            		+"<a href="+url+">Show Details</a></button>",true);
+//
+//	            emailSenderService.sendEmail(mailMessage);
+//	            
+				adminService.addMerchant(md);
 	            return ResponseEntity.ok(HttpStatus.OK);
-	        }
 	    }
 	    
 	    
 	    @RequestMapping(value="/confirm-account", method= {RequestMethod.GET, RequestMethod.POST})
 	    public ResponseEntity<?> confirmUserAccount(@Valid  @RequestParam("token") String confirmationToken)
 	    {
-	        ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
+	    	logger.trace("Confirm User Account working...");
+	        //ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
 
-	        if(token != null)
-	        {
-	            if(userRepository.findCustomerById(token.getUid())!=null) {
-	            	CustomerDetails cd=userRepository.findCustomerById(token.getUid());
-	            	cd.setActive(true);
-	                userRepository.saveCustomer(cd);
-	            }
-	       
-	            return ResponseEntity.ok(HttpStatus.OK);
-	      }
-	        else
-	        {
+	    	boolean val = adminService.confirmAccount(confirmationToken);
+	        if(val == true) {
+	        	return ResponseEntity.ok(HttpStatus.OK);
+	        }
+	        else {
 	        	return new ResponseEntity<Error>(HttpStatus.CONFLICT);
 	        }
+//	        if(token != null)
+//	        {
+//	            if(userRepository.findCustomerById(token.getUid())!=null) {
+//	            	CustomerDetails cd=userRepository.findCustomerById(token.getUid());
+//	            	cd.setActive(true);
+//	                userRepository.saveCustomer(cd);
+//	            }
+//	       
+//	            return ResponseEntity.ok(HttpStatus.OK);
+//	       }
+//	        else
+//	        {
+//	        	return new ResponseEntity<Error>(HttpStatus.CONFLICT);
+//	        }
 	     }
 	    
 	    @GetMapping("/generateToken")
 	    public ResponseEntity<?> generateToken(@Valid  @RequestParam("token") String confirmationToken,@Valid  @RequestParam("action") String action) throws MessagingException{
 	    	
-	    	ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
-	    	
-	    	MerchantDetails md=userRepository.findMerchantById(token.getUid());
-	    	if(action.equals("Accept")) {
-	    	md.setActive(true);
-	    	md.setApproved(true); }
-	    	else {
-	    	md.setActive(false);
-	    	md.setApproved(false);  }
-	    	
-	        userRepository.saveMerchant(md);
-	        
-	        MimeMessage mailMessage = emailSenderService.createMessage();
-	        MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
-	        helper.setTo(md.getEmail());
-	        helper.setSubject("Account Activated!");
-	        helper.setFrom("capstore06@gmail.com");
-	        helper.setText("Admin approved your account.\nTo login and access your account, please click here : "
-	        +"http://localhost:4200");
-
-	        emailSenderService.sendEmail(mailMessage);
-	        
-	        return ResponseEntity.ok().body(md);
+	    	logger.trace("Generate Token working...");
+//	    	ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
+//	    	
+//	    	MerchantDetails md=userRepository.findMerchantById(token.getUid());
+//	    	if(action.equals("Accept")) {
+//	    	md.setActive(true);
+//	    	md.setApproved(true); }
+//	    	else {
+//	    	md.setActive(false);
+//	    	md.setApproved(false);  }
+//	    	
+//	        userRepository.saveMerchant(md);
+//	        
+//	        MimeMessage mailMessage = emailSenderService.createMessage();
+//	        MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
+//	        helper.setTo(md.getEmail());
+//	        helper.setSubject("Account Activated!");
+//	        helper.setFrom("capstore06@gmail.com");
+//	        
+//	        helper.setText("<html><body style='border-style: solid;\r\n" + 
+//            		"  border-color: #DCDCDC; background-color: #F0FFFF; height: 250px; width:500px; margin-left:250px'>"
+//            		+ "<h1>Admin approved your account!</h1><br>To login and access your account, please click here : <br>" +
+//            		"http://localhost:4200",true);
+//
+//	        emailSenderService.sendEmail(mailMessage);
+	    	MerchantDetails merchant = adminService.generateToken(confirmationToken, action);
+	        return ResponseEntity.ok().body(merchant);
 	    }
 	    
 	    @RequestMapping(value="/login", method= {RequestMethod.GET, RequestMethod.POST})
 	    public ResponseEntity<?> userLogin(@Valid @RequestBody String[] userCredentials) {
+	    	logger.trace("User Login working...");
 	    	String email=userCredentials[0];
 	    	String pass=userCredentials[1];
 	    	String role=userCredentials[2];
@@ -214,8 +225,10 @@ public class AdminController {
 	    
 	    @RequestMapping(value="/getMerchant", method= {RequestMethod.GET, RequestMethod.POST})
 	    public ResponseEntity<?> userLogin(@Valid  @RequestParam("token") String confToken) {
-	    	ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confToken);
-	    	MerchantDetails md=userRepository.findMerchantById(token.getUid());
+	    	logger.trace("User Login working...");
+//	    	ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confToken);
+//	    	MerchantDetails md=userRepository.findMerchantById(token.getUid());
+	    	MerchantDetails md=adminService.userLogin(confToken);
 	    	return ResponseEntity.ok().body(md);
 	    }
 		
@@ -223,6 +236,7 @@ public class AdminController {
 
 		@GetMapping(value = "/findMerchantById/{userId}")
 		public MerchantDetails getMerchant(@PathVariable("userId")Integer userId) {
+			logger.trace("Get Merchant by Id working...");
 			return adminService.findMerchantById(userId);
 			
 		}
@@ -230,6 +244,7 @@ public class AdminController {
 		
 		 @GetMapping("/getAllMerchants")
 		 public ResponseEntity<List<MerchantDetails>> getAllMerchants(){
+		    logger.trace("Get all Merchants working...");
 			List<MerchantDetails> merchants= adminService.getAllMerchant();
 				if(merchants.isEmpty()) {
 				return new ResponseEntity("Sorry! No Merchant Found!", HttpStatus.NOT_FOUND);
@@ -240,6 +255,7 @@ public class AdminController {
 		 
 		@DeleteMapping("/deleteMerchant/{merchantId}")
 		public  Map<String, Boolean> deleteMerchant(@PathVariable("merchantId")int merchantId) {
+			 logger.trace("Delete Merchant working...");
 			 adminService.removeMerchantById(merchantId);
 			 Map<String, Boolean> response = new HashMap<>();
 			 response.put("deleted", Boolean.TRUE);
@@ -248,12 +264,14 @@ public class AdminController {
 		
 		
 		@RequestMapping(value ="/inviteUsers",method = { RequestMethod.GET,RequestMethod.POST })
-		public void invite(User user){//Not written 
+		public void invite(User user){
+			 logger.trace("Invite Users working...");
 		     emailService.sendInvitationsToUsers(user);	
 		}
 		
 		@PutMapping(value="/updateMerchant")
 		public boolean update(@RequestBody MerchantDetails merchant) {
+			 logger.trace("Update Merchant working...");
 		     return adminService.updateMerchant(merchant);
 		}
 		
@@ -262,11 +280,13 @@ public class AdminController {
 		 @DeleteMapping("deleteProduct/{productID}")
 		 public boolean DeleteProduct(@PathVariable("productID")int productID)
 		 {
+			 logger.trace("Delete Product working...");
 			 return adminService.removeProduct(productID);
 		 }
 		
 		@PostMapping("/addProduct")
 		public Product addProduct(@RequestBody Product product) {
+			logger.trace("Add Product working...");
 			product.setProductId((int)(Math.random()*100000));
 			product.setDiscount(0);
 			return adminService.addProduct(product);
@@ -274,21 +294,25 @@ public class AdminController {
 		
 		@GetMapping("/getAllProducts")
 		List<Product> getAllProducts(){
+			logger.trace("Get All Products working...");
 			return adminService.getAllProducts();
 		}
 		
 		@GetMapping("/getProductById/{productId}")
 		Product getProductByProductId(@PathVariable int productId) {
+			logger.trace("Get Product by Id working...");
 			return adminService.getProductByProductId(productId);
 		}
 		
 		@PutMapping("/updateProduct")
 		boolean update(@RequestBody Product product) {
+			logger.trace("Update Product working...");
 			return adminService.update(product);
 		}
 		
 		@PutMapping("/updateCategoryByCategory")
 		boolean updateCategoryByCategory(@RequestParam("productCategory")String productCategory, @RequestParam("updatedCategory")String updatedCategory) {
+			logger.trace("Update Category working...");
 			return adminService.updateCategoryByCategory(productCategory, updatedCategory);
 		}
 			
@@ -298,27 +322,7 @@ public class AdminController {
 		
 		@PostMapping(value = "/create")
 		public ResponseEntity<Coupon> addCoupon(@Valid @RequestBody Coupon coupon) throws MessagingException {
-		
-//	  			couponRepo.save(coupon);
-//	            
-//	  			long cnt=merchantRepository.count();
-//	  			List <MerchantDetails> merchants=merchantRepository.findAll();
-//	            MimeMessage mailMessage = emailSenderService.createMessage();
-//	            MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
-//	            String url = "http://localhost:4200/applyCoupon/"+coupon.getCouponId();
-//	            
-//	           
-//	            	for(MerchantDetails mer:merchants) {
-//	            		System.out.println("In for");
-//	            		helper.setTo(mer.getEmail());
-//	            		System.out.println(mer.getEmail());
-//	            		helper.setSubject("Coupon Creation Approval!");
-//	                    helper.setText("<html><body><h1>Coupon Registration!</h1><br>" +
-//	              			  coupon+"<br><button type='submit' class='is-small btn btn-info'>"
-//	        		  		+ "<a href="+url+"/"+mer.getUserId()+">Show Details</a></button>",true);
-//	                    
-//	                    emailSenderService.sendEmail(mailMessage);
-//	            	}
+			logger.trace("Add Coupon working...");
 			adminService.addCoupon(coupon);
 	            
 				return new ResponseEntity<Coupon>(HttpStatus.CREATED);
@@ -326,71 +330,27 @@ public class AdminController {
 	    
 	    @PutMapping("/generateCoupon/{couponId}/{id}")
 	    public Coupon generateCoupon(@PathVariable("couponId") int couponId, @PathVariable("id") int id) throws Exception{
-//	    	Coupon coupon = couponRepo.findById(couponId)
-//	    			.orElseThrow(() -> new Exception("Coupon not found for this id : " + couponId));
-//	    	
-//	        ConfirmationToken confirmationToken = new ConfirmationToken(coupon.getUserId());
-//	       confirmationTokenRepository.save(confirmationToken);
-//	        
-//	        MerchantDetails merchant = merchantRepository.findById(id)
-//	        		.orElseThrow(()->new Exception("Merchant not found for this id : " + coupon.getUserId()));
-//	        
-//	        coupon.setApproved(true);
-//	        coupon.setUseId(id);
-//	        couponRepo.save(coupon);
-//	        merchantRepository.save(merchant);
-//	        
-//	        MimeMessage mailMessage = emailSenderService.createMessage();
-//	        MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
-//	        String url = "http://localhost:4200/sendCoupon/"+coupon.getCouponId();
-//	        helper.setTo("dsonaje6@gmail.com");
-//	        helper.setSubject("Coupon Accepted!");
-//	        helper.setFrom("capstore06@gmail.com");
-//	        helper.setText("Merchant accepted coupon offer: "+coupon+"\nTo send this offer, please click here : "
-//	        +"\n"+url);
-//
-//	        emailSenderService.sendEmail(mailMessage);
-	        
+	    	logger.trace("Generate Coupon working...");
 	        return adminService.generateCoupon(couponId, id);
 	    }
 	  
 	    ///////////////////////////////new/////////////////////////////////
 	    @PutMapping("/sendCoupon/{couponId}")
 	    public Coupon sendCoupon(@PathVariable("couponId") int couponId) throws Exception{
-//	    	Coupon coupon = couponRepo.findById(couponId)
-//	    			.orElseThrow(() -> new Exception("Coupon not found for this id : " + couponId));
-//	        
-//	        MimeMessage mailMessage = emailSenderService.createMessage();
-//	        MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
-//	        String url = "http://localhost:4200/productpage/";
-//	        
-//	        List <MerchantDetails> merchants = merchantRepository.findAll();
-//	        
-//	        for(MerchantDetails mer:merchants) {
-//	    		helper.setTo(mer.getEmail());
-//	    		helper.setSubject("Latest Offers!!!");
-//	            helper.setFrom("capstore06@gmail.com");
-//	            helper.setText("Current Offers: "+coupon+"\nGrab this offer, please click here : "
-//	            +"\n"+url);
-//
-//	            emailSenderService.sendEmail(mailMessage);
-//	    	}
-	        return adminService.sendCoupon(couponId);
+	    	logger.trace("Send Coupon working...");
+	    	return adminService.sendCoupon(couponId);
 	    }
 	    
 	    ////////////////////////////////////////////////////////////////////////
 	  	@GetMapping("/coupons")
 		public ResponseEntity<List<Coupon>>getAllCoupons(){
-//	  		List<Coupon> coupon = new ArrayList<>();
-//			couponRepo.findAll().forEach(coupon::add);
-			return new ResponseEntity<List<Coupon>>(adminService.getCoupons(),HttpStatus.OK);
+	  		logger.trace("Get All Coupons working...");
+	  		return new ResponseEntity<List<Coupon>>(adminService.getAllCoupons(),HttpStatus.OK);
 		}
 		
 		@PutMapping("/Id/{couponId}")
 		public ResponseEntity<Coupon> getCouponById(@PathVariable("couponId") int couponId) throws Exception{
-//			Coupon coupon = couponRepo.findById(couponId)
-//					.orElseThrow(() -> new Exception("Coupon not found for this id : " + couponId));
-//		    
+			logger.trace("Get Coupon by Id working...");
 			return new ResponseEntity<Coupon>(adminService.getCouponById(couponId), HttpStatus.OK);
 		}
 		
@@ -407,9 +367,8 @@ public class AdminController {
 		
 		@DeleteMapping("/coupon/{promocodeId}")
 		public ResponseEntity<Boolean> deleteCoupon(@PathVariable("promocodeId") int couponId){
-			System.out.println("Deleted1");
+			logger.trace("Delete Coupon working...");
 			adminService.deleteCoupon(couponId);
-			System.out.println("Deleted2");
 			return ResponseEntity.ok().body(true);
 			
 		}
@@ -430,11 +389,11 @@ public class AdminController {
 	
 	//Common Feedback:
 		
-//		@PutMapping(value="/forwardRequestToMerchant/{feedbackId}")
-//		public int forwardRequestToMerchant(@PathVariable int feedbackId) {
-//			return adminService.forwardRequestToMerchant(feedbackId);
-//		}
-		
+		@PutMapping(value="/forwardRequestToMerchant/{feedbackId}")
+		public int forwardRequestToMerchant(@PathVariable int feedbackId) {
+			return adminService.forwardRequestToMerchant(feedbackId);
+		}
+			
 		@GetMapping(value="/forwardResponseToCustomer/{feedbackId}")
 		public String forwardResponseToCustomer(@PathVariable int feedbackId) {
 			return adminService.forwardResponseToCustomer(feedbackId);

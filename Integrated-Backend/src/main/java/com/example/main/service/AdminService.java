@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.example.main.exception.UserAlreadyExistsException;
 import com.example.main.model.CommonFeedback;
 import com.example.main.model.Coupon;
 import com.example.main.model.CustomerDetails;
@@ -18,13 +19,15 @@ import com.example.main.model.ProductFeedback;
 public interface AdminService {
 
 	//Merchant
-	public MerchantDetails addMerchant(MerchantDetails m);
+	public void addMerchant(MerchantDetails m) throws MessagingException, UserAlreadyExistsException;
 	public void removeMerchantById(int merchantId);
 	public List<MerchantDetails> getAllMerchant();
 	public boolean updateMerchant(MerchantDetails m);
 	public MerchantDetails findMerchantById(int userId);
 	public MerchantDetails verifyMerchantDetails(String email);
-	public MerchantDetails getApproval(String email, boolean approved);
+	public MerchantDetails userLogin(String confToken);
+	public boolean confirmAccount(String confirmationToken);
+	MerchantDetails generateToken(String confirmationToken, String action) throws MessagingException;
 	
 	//Products
 	Product addProduct(Product product);
@@ -46,7 +49,7 @@ public interface AdminService {
 	List<CommonFeedback> getAllCommonFeedbackByProductId(int productId);
 	CommonFeedback getCommonFeedbackById(int feedbackId);
 	List<CommonFeedback> getAllCommonFeedbackByUserId(int userId);
-//	int forwardRequestToMerchant(int feedbackId);
+	int forwardRequestToMerchant(int feedbackId);
 	String forwardResponseToCustomer(int feedbackId);
 	List<CommonFeedback> getAll();
 	
@@ -62,7 +65,7 @@ public interface AdminService {
 	
 	
 	//Coupon:
-	List<Coupon> getCoupons();
+	List<Coupon> getAllCoupons();
 	Coupon getCouponById(int couponId) throws Exception;
 	Coupon getCouponByCode(String couponCode);
 	void addCoupon(@Valid Coupon coupon) throws MessagingException;
