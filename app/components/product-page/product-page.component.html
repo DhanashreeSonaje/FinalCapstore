@@ -1,0 +1,114 @@
+<head>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+<body>
+<!--navigation bar-->
+<div>
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <ul class="nav navbar-nav">
+
+
+        <li>
+          <div id="mySidebar" class="sidebar">
+            <a class="closebtn" (click)="closeNav()">×</a>
+            <ul>
+              <li><h1 style="color: white;">Menu</h1></li>
+            <li><a href="#">Profile</a></li>
+            <li><a href="#">Wish List</a></li>
+            <li> <a href="#">Feedback</a></li>
+            <li>  <a href="#">Orders</a></li></ul>
+          </div>
+        
+           <a style="padding-top: 20px;" (click)="openNav()"><b>☰ </b></a>  
+        </li>
+       
+        <li style="padding-top: 6px;"> <a id="title" (click)="homePage()" ><b>Home</b></a></li>
+      <li style="padding-top: 6px;"> <a id="title" (click)="openPop()" ><b>Coupons </b></a></li>
+      
+      <li> <b style="color: white;"><h1 style="padding-left: 650px;">Capstore</h1> </b></li>
+
+         </ul>
+         <div style="float: right;padding-top: 6px;">
+         <div class="search-container">
+          <form class="form-inline">
+            <input  class="form-control mr-sm-2" style="width: 500px;margin-right: 3px;margin-top: 6px;" type="text"    required  [(ngModel)]="searchProduct" name="username" ngModel>
+           <input class="btn btn-primary" type="submit" value="Search" style="margin-top: 6px;" (click)="search()"><i class="glyphicon glyphicon-triangle-bottom"></i>
+           
+          </form>
+        </div>
+      </div>
+    </div>
+  </nav></div>
+
+ <!--to display promo codes-->
+<div class="w3-container">
+  <div id="id01" class="w3-modal">
+    <div class="w3-modal-content">
+      <div class="w3-container">
+        <span (click)="closePop()" class="w3-button w3-display-topright">&times;</span>
+        <div class="scroll">
+       <table class=" table table-striped">
+     <thead>
+       <tr>
+        
+        <th>Coupon Amount</th>
+         <th>Coupon Start Date</th>
+         <th>Coupon End Date</th>
+         <th>Minimum Order Amount</th>
+       </tr>
+     </thead>
+     <tbody>
+       <tr *ngFor="let coupon of couponList">
+       <td>{{coupon.couponAmount}}</td>
+       <td>{{coupon.couponStartDate}}</td>
+       <td>{{coupon.couponEndDate}}</td>
+       <td>{{coupon.couponMinOrderAmount}}</td></tr>
+     </tbody>
+       </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+        <!-- product page -->
+<div class="container">
+    <div class="row">
+        <div class="col-2">
+            <div class="card" style="background-color: white; ">
+                <img [src]="singleProduct.productImage">
+            </div> &nbsp;
+            <div class="col-8">
+                <div class="card" style="background-color: white;">
+                    <h3>{{singleProduct.productName}}</h3>
+                    <h5>price: {{singleProduct.productPrice | currency : 'INR'}}</h5>
+                </div>
+            </div>
+            <div class="col-2">
+                <button class="btn btn-primary"> add to wishlist</button>&nbsp;
+                <button class="btn btn-primary"> add to cart</button>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row card" style="background-color: white;">
+        <h5><b>Brand: </b>{{singleProduct.productBrand}}</h5>
+        <h5><b>Category: </b>{{singleProduct.productCategory}}</h5>
+        <h5><b>Offer: </b>{{singleProduct.discount}}%</h5>
+        <h5><b>Rating: </b>{{singleProduct.productRating}}</h5><br><br>
+        <p>{{singleProduct.productInfo}}</p>
+    </div><br><br>
+
+    <div class="row card form-group" style="background-color: white;">
+        <p><b>Feedback</b></p>
+        <input type="text" placeholder="type here" class="form-control"><br>
+        <input type="button" class="btn btn-primary"  value="submit">
+    </div>
+</div>
+
+
+
+</body>

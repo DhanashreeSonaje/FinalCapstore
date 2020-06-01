@@ -1,0 +1,35 @@
+<div class="container">
+  <div [hidden]="submitted">
+        <div class="panel-body">
+          <table class="table table-striped table-hover" style="color:indigo" >
+              <thead>
+                  <tr>
+                      <th>Merchant Id</th>
+                      <th>Coupon Id</th>
+                      <th>Coupon Code</th>
+                      <th>Coupon Start Date</th>
+                      <th>Coupon End Date</th>
+                      <th>Coupon Amount</th>
+                      <th>Coupon Min Order Amount</th>
+                      <th>Accept</th>
+                      <th>Reject</th>
+                  </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="coupon1">
+                  <td>{{userId}}</td>
+                  <td>{{coupon1.couponId}}</td>
+                  <td>{{coupon1.couponCode}}</td>
+                  <td>{{coupon1.couponStartDate}}</td>
+                  <td>{{coupon1.couponEndDate}}</td>
+                  <td>{{coupon1.couponAmount}}</td>
+                  <td>{{coupon1.couponMinOrderAmount}}</td>
+                  <td><button (click)="acceptCoupon(coupon1.couponId, userId)" class="is-small btn btn-primary">Accept</button></td>
+                  <td><button (click)="rejectCoupon(coupon1.couponId, userId)" class="is-small btn btn-danger">Reject</button></td>
+                </tr>
+              </tbody>
+          </table>
+          <button class="btn btn-info" (click)="back()">Back</button>
+      </div>
+  </div>
+  </div>

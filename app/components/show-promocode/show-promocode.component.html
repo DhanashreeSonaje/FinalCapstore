@@ -1,0 +1,43 @@
+<h1 style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;text-align: center;"> SHOW PROMOCODE</h1>
+
+<div class="container">
+  
+    <div [hidden]="submitted">
+      
+       
+        <div class="panel-body">
+          <div class="error">
+            <div *ngIf="error">{{error}}</div><br>
+          </div>
+            <table class="table table-striped table-hover" style="color:indigo" >
+              <thead>
+                <tr>
+                    <th>Coupon Id</th>
+                    <th>Coupon Code</th>
+                    <th>Coupon Start Date</th>
+                    <th>Coupon End Date</th>
+                    <th>Coupon Amount</th>
+                    <th>Coupon Min Order Amount</th>
+                    <th><input type="any" name="searchTerm" id="myInput" style="width: 300px;" placeholder="Search..." [(ngModel)]=searchTerm/>&nbsp;&nbsp;
+                    </th> 
+                  </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let c of coupon | filter:searchTerm ">
+                    <td>{{c.couponId}}</td>
+                    <td>{{c.couponCode}}</td>
+                    <td>{{c.couponStartDate}}</td>
+                    <td>{{c.couponEndDate}}</td>
+                    <td>{{c.couponAmount}}</td>
+                    <td>{{c.couponMinOrderAmount}}</td>
+                    <td><button (click)="deleteCoupon(c.couponId)" class="btn btn-danger">Delete</button></td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+        <div small class="text-danger" style="font-size: 25px; font-style: oblique;">{{ error }}</div>
+        </div>
+<button (click)="back()"  class="btn btn-secondary" style="margin-left: 10px">Back</button>
+
+
+

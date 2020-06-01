@@ -1,0 +1,280 @@
+<head>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  
+</head>
+<body>
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <span class="navbar-brand" style="color: whitesmoke;"
+          ><strong><b>CapStore</b></strong></span>
+        
+      </div>
+      <ul class="nav navbar-nav">
+        <li style="color: whitesmoke;" class="active">
+          <a href="#"><span class="glyphicon glyphicon-home"></span> Sign Up</a>
+        </li>
+        <li style="color: whitesmoke;">
+          <a href="#"
+            ><span
+              style="color: whitesmoke;"
+              class="glyphicon glyphicon-globe"
+            ></span>
+            About Us</a
+          >
+        </li>
+        <li style="color: whitesmoke; margin-left: 700px;">
+          <a href="#"
+            ><span
+              style="color: whitesmoke;"
+              class="glyphicon glyphicon-envelope"
+            ></span>
+            Mail Us</a
+          >
+        </li>
+        <li style="color: whitesmoke;">
+          <a href="#"
+            ><span
+              style="color: whitesmoke;"
+              class="glyphicon glyphicon-earphone"
+            ></span>
+            Call Us</a
+          >
+        </li>
+        <li style="color: whitesmoke;">
+          <a [routerLink]="['/login']"
+            ><span
+              style="color: whitesmoke;"
+              class="glyphicon glyphicon-log-in"
+            ></span>
+            Log in</a
+          >
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="loginbox">
+    <img src="/assets/avatar.svg" class="avatar" alt="User" />
+    <form (ngSubmit)="validateUser()" #enForm="ngForm">
+      <label>Full Name</label>
+      <input
+        type="text"
+        class="form-control"
+        #name2="ngModel"
+        pattern="^[A-Za-z\s]{3,20}$"
+        placeholder="Enter Full Name"
+        id="fullName"
+        name="fullName"
+        [(ngModel)]="userDetails.name"
+        required
+      />
+      <div *ngIf="name2.invalid && (name2.dirty || name2.touched)">
+        <small class="text-danger">
+          <small *ngIf="name2.errors.required || name2.errors.pattern">
+            Name is required.
+          </small>
+        </small>
+      </div>
+      <label>Username</label>
+      <input
+        type="text"
+        class="form-control"
+        #name2="ngModel"
+        pattern="^[A-Za-z\s]{3,20}$"
+        placeholder="Enter Username"
+        id="username"
+        name="username"
+        [(ngModel)]="userDetails.username"
+        required
+      />
+      <div *ngIf="name2.invalid && (name2.dirty || name2.touched)">
+        <small class="text-danger">
+          <small *ngIf="name2.errors.required || name2.errors.pattern">
+            Username is required.
+          </small>
+        </small>
+      </div>
+      <label>Password</label>
+      <input
+        type="password"
+        class="form-control"
+        pattern="^[A-Za-z0-9\s]{5,100}$"
+        #pass="ngModel"
+        placeholder="Password"
+        id="pass"
+        name="pass"
+        [(ngModel)]="password"
+        required
+      />
+      <div *ngIf="pass.invalid && (pass.dirty || pass.touched)">
+        <small class="text-danger">
+          <small *ngIf="pass.errors.required">
+            Password is required.
+          </small>
+          <small *ngIf="pass.errors.pattern">
+            Min length 5.
+          </small>
+        </small>
+      </div>
+      <label>ReEnter Password</label>
+      <input
+        type="password"
+        appConfirmEqualValidator="pass"
+        class="form-control"
+        #pass1="ngModel"
+        placeholder="Password"
+        id="pass1"
+        name="pass1"
+        [(ngModel)]="userDetails.password"
+        required
+      />
+      <div *ngIf="pass1.invalid && (pass1.dirty || pass1.touched)">
+        <small class="text-danger">
+          <small *ngIf="pass1.errors.required">
+            Password is required.
+          </small>
+        </small>
+        <small
+          *ngIf="
+            pass1.touched && pass1.errors.notEqual && !pass1.errors.required
+          "
+        >
+          <small class="text-danger">
+            Password and reEnter password does not match</small
+          >
+        </small>
+      </div>
+      <label>Email</label>
+      <input
+        type="email"
+        class="form-control"
+        pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+        #email="ngModel"
+        placeholder="E-mail"
+        id="email"
+        name="email"
+        [(ngModel)]="userDetails.email"
+        required
+      />
+
+      <div *ngIf="email.invalid && (email.dirty || email.touched)">
+        <small class="text-danger">
+          <small *ngIf="email.errors.required">
+            E-Mail is required.
+          </small>
+          <small *ngIf="email.errors.pattern">
+            Invalid Email
+          </small>
+        </small>
+      </div>
+      <label>Phone Number</label>
+      <input
+        type="text"
+        name="no"
+        pattern="^[0-9]{10}$"
+        #no="ngModel"
+        [(ngModel)]="userDetails.phoneNumber"
+        class="form-control"
+        placeholder="Mobile Number"
+        #mobile="ngModel"
+        required
+      />
+      <div *ngIf="no.invalid && (no.dirty || no.touched)">
+        <small class="text-danger">
+          <small *ngIf="no.errors.required">
+            Phone Number is mandatory.
+          </small>
+          <small *ngIf="no.errors.pattern">
+            Invalid Number.
+          </small>
+        </small>
+      </div>
+      <label>Alternate Phone Number</label>
+      <input
+        type="text"
+        name="alternateNo"
+        pattern="^[0-9]{10}$"
+        #no="ngModel"
+        [(ngModel)]="userDetails.alternatePhoneNumber"
+        class="form-control"
+        placeholder="Alternate Mobile Number"
+        #mobile="ngModel"
+      />
+      <div *ngIf="no.invalid && (no.dirty || no.touched)">
+        <small class="text-danger">
+          <small *ngIf="no.errors.required">
+            Phone Number is mandatory.
+          </small>
+          <small *ngIf="no.errors.pattern">
+            Invalid Number.
+          </small>
+        </small>
+      </div>
+      <label>Alternate Email</label>
+      <input
+        type="email"
+        class="form-control"
+        pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+        #email="ngModel"
+        placeholder="E-mail"
+        id="alternateEmail"
+        name="alternateEmail"
+        [(ngModel)]="userDetails.alternateEmail"
+      />
+      <div *ngIf="email.invalid && (email.dirty || email.touched)">
+        <small class="text-danger">
+          <small *ngIf="email.errors.required">
+            E-Mail is required.
+          </small>
+          <small *ngIf="email.errors.pattern">
+            Invalid Email
+          </small>
+        </small>
+      </div>
+      <div class="form-group">
+        <label for="Role">Role</label>
+        <br />
+        <label class="radio-inline" style="display: inline;">
+          <input
+            type="radio"
+            name="role"
+            [(ngModel)]="role"
+            value="Customer"
+            required
+            #selectedBy="ngModel"
+          />Customer
+        </label>
+        <label class="radio-inline">
+          <input
+            type="radio"
+            name="role"
+            [(ngModel)]="role"
+            value="Merchant"
+            #selectedBy="ngModel"
+            required
+          />Merchant
+        </label>
+        <label class="radio-inline">
+          <input
+            type="radio"
+            name="role"
+            [(ngModel)]="role"
+            value="Third-Party Merchant"
+            #selectedBy="ngModel"
+            required
+          />Third-Party Merchant
+        </label>
+        <div
+          *ngIf="selectedBy.invalid && (selectedBy.dirty || selectedBy.touched)"
+        >
+          <small class="text-danger">
+            <small *ngIf="selectedBy.errors.required">
+              Field is mandatory.
+            </small>
+          </small>
+        </div>
+      </div>
+      <input type="submit" value="Sign-Up" [disabled]="enForm.form.invalid" />
+    </form>
+  </div>
+</body>

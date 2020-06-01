@@ -1,0 +1,21 @@
+<h1 style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;text-align: center;"> SHOW DISCOUNT</h1>
+<table class="table table-striped table table-hover" id="myTable">
+    <thead class="thead-light">
+    <tr>
+        <th>Product Id</th>
+        <th>Product Name</th>
+        <th>Product Price</th>
+        <th>Product Discount</th>
+       <th><input type="any" name="searchTerm" id="myInput" style="width: 300px;" placeholder="Search.." [(ngModel)]=searchTerm/>&nbsp;&nbsp;
+       </th> 
+    </tr>
+  </thead>
+    <tr *ngFor="let c of product | filter:searchTerm ">
+        <td>{{c.productId}}</td>
+        <td>{{c.productName}}</td>
+        <td>{{c.productPrice}}</td>
+        <td>{{c.discount}}</td>
+    </tr>
+
+</table>
+<button (click)="back()"  class="btn btn-secondary" style="margin-left: 10px">Back</button>
